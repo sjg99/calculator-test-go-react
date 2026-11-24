@@ -5,7 +5,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/sjg99/sezzle-calculator/backend/internal/config"
+	"github.com/sjg99/calculator-test-go-react/backend/internal/config"
 )
 
 func env(vars map[string]string) func(string) string {

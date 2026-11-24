@@ -15,9 +15,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sjg99/sezzle-calculator/backend/internal/api"
-	"github.com/sjg99/sezzle-calculator/backend/internal/config"
-	"github.com/sjg99/sezzle-calculator/backend/internal/core/calculator"
+	"github.com/sjg99/calculator-test-go-react/backend/internal/api"
+	"github.com/sjg99/calculator-test-go-react/backend/internal/config"
+	"github.com/sjg99/calculator-test-go-react/backend/internal/core/calculator"
 )
 
 const shutdownTimeout = 10 * time.Second

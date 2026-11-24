@@ -5,7 +5,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/sjg99/sezzle-calculator/backend/internal/core/calculator"
+	"github.com/sjg99/calculator-test-go-react/backend/internal/core/calculator"
 )
 
 func TestCalculate_Success(t *testing.T) {

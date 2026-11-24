@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sjg99/sezzle-calculator/backend/internal/api"
-	"github.com/sjg99/sezzle-calculator/backend/internal/core/calculator"
+	"github.com/sjg99/calculator-test-go-react/backend/internal/api"
+	"github.com/sjg99/calculator-test-go-react/backend/internal/core/calculator"
 )
 
 var discardLogger = slog.New(slog.NewTextHandler(io.Discard, nil))

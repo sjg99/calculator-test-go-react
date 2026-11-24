@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/sjg99/sezzle-calculator/backend/internal/core/calculator"
+	"github.com/sjg99/calculator-test-go-react/backend/internal/core/calculator"
 )
 
 // Error codes returned in error bodies. Clients rely on these, not on messages.
