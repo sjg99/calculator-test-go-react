@@ -1,0 +1,188 @@
+openapi: 3.1.0
+info:
+  title: Calculator API
+  version: 1.0.0
+  description: |
+    Stateless arithmetic service used by the calculator frontend.
+    Results are IEEE-754 doubles rounded to 12 significant digits (ADR 0004).
+    Clients should rely on the error `code`, never on the `message` text.
+servers:
+  - url: http://localhost:8080
+    description: Backend run directly
+  - url: http://localhost:3000
+    description: Through the nginx proxy (docker compose)
+
+paths:
+  /api/v1/calculate:
+    post:
+      operationId: calculate
+      summary: Perform one arithmetic operation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculationRequest'
+            examples:
+              divide:
+                value: { operation: divide, operands: [10, 4] }
+              sqrt:
+                value: { operation: sqrt, operands: [16] }
+              percentOfBase:
+                summary: 10% of 200
+                value: { operation: percent, operands: [10, 200] }
+      responses:
+        '200':
+          description: Calculation succeeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationResponse'
+              example: { operation: divide, operands: [10, 4], result: 2.5 }
+        '400':
+          description: The request body is malformed or does not match the schema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: { code: invalid_request, message: 'operands must be an array of numbers' }
+        '413':
+          description: The request body is larger than 1 MB
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: { code: payload_too_large, message: request body must not exceed 1048576 bytes }
+        '422':
+          description: The request is well formed but the calculation is not possible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                divisionByZero:
+                  value:
+                    error: { code: division_by_zero, message: division by zero }
+                negativeSquareRoot:
+                  value:
+                    error: { code: negative_square_root, message: square root of a negative number }
+        '500':
+          description: Unexpected server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/operations:
+    get:
+      operationId: listOperations
+      summary: List the supported operations
+      responses:
+        '200':
+          description: Supported operations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationsResponse'
+              example:
+                operations:
+                  - { name: add, symbol: '+', minOperands: 2, maxOperands: 2 }
+                  - { name: sqrt, symbol: '√', minOperands: 1, maxOperands: 1 }
+                  - { name: percent, symbol: '%', minOperands: 1, maxOperands: 2 }
+
+  /healthz:
+    get:
+      operationId: health
+      summary: Liveness check
+      responses:
+        '200':
+          description: The service is running
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: { type: string, const: ok }
+
+components:
+  schemas:
+    OperationName:
+      type: string
+      enum: [add, subtract, multiply, divide, power, sqrt, percent]
+      description: |
+        add, subtract, multiply, divide, power: two operands.
+        sqrt: one operand.
+        percent: [value] gives value / 100; [value, base] gives base * value / 100.
+
+    CalculationRequest:
+      type: object
+      additionalProperties: false
+      required: [operation, operands]
+      properties:
+        operation:
+          type: string
+          description: >
+            One of the names in OperationName. Typed as a free string so that an unknown
+            name is reported as 422 unsupported_operation rather than 400.
+          examples: [divide]
+        operands:
+          type: array
+          items: { type: number }
+          minItems: 1
+
+    CalculationResponse:
+      type: object
+      required: [operation, operands, result]
+      properties:
+        operation: { $ref: '#/components/schemas/OperationName' }
+        operands:
+          type: array
+          items: { type: number }
+        result: { type: number }
+
+    Operation:
+      type: object
+      required: [name, symbol, minOperands, maxOperands]
+      properties:
+        name: { $ref: '#/components/schemas/OperationName' }
+        symbol: { type: string }
+        minOperands: { type: integer }
+        maxOperands: { type: integer }
+
+    OperationsResponse:
+      type: object
+      required: [operations]
+      properties:
+        operations:
+          type: array
+          items: { $ref: '#/components/schemas/Operation' }
+
+    ErrorCode:
+      type: string
+      enum:
+        - invalid_request
+        - payload_too_large
+        - unsupported_operation
+        - invalid_operand_count
+        - invalid_operand
+        - division_by_zero
+        - negative_square_root
+        - undefined_result
+        - result_overflow
+        - internal_error
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { $ref: '#/components/schemas/ErrorCode' }
+            message:
+              type: string
+              description: Human-readable detail for logs and debugging. Not stable.
