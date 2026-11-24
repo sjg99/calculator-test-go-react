@@ -1,6 +1,6 @@
 # Functional specification
 
-Status: draft for review · Owner: candidate · Related: [architecture](architecture.md), [API contract](../../api/openapi.yaml)
+Status: accepted, implemented · Owner: candidate · Related: [architecture](architecture.md), [API contract](../../api/openapi.yaml)
 
 ## 1. Scope
 

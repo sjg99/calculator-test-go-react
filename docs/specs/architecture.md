@@ -1,6 +1,6 @@
 # Architecture
 
-Status: draft for review · Related: [functional spec](functional.md), [ADRs](../adr/)
+Status: accepted, implemented · Related: [functional spec](functional.md), [ADRs](../adr/)
 
 ## 1. System overview
 
@@ -95,13 +95,14 @@ code, never on the message text.
 src/
   api/                       HTTP client and typed calculator API (the only code that calls fetch)
   features/calculator/
-    state/                   pure reducer, action types, selectors
+    state/                   pure reducer, types, operation rules (percent base, labels), persistence schema
     hooks/                   useCalculator (side effects), useKeyboard
-    components/              Calculator, Display, Keypad, HistoryPanel
+    components/              Calculator, Display, Keypad (+ key and keyboard map), HistoryPanel
+    errorMessages.ts         error code → user-facing message
   shared/
     components/              Button, Panel (presentational, reusable)
     hooks/                   usePersistentReducer
-    lib/                     storage, number formatting
+    lib/                     storage, number formatting, class names
   styles/                    design tokens (CSS custom properties), global styles
 ```
 
@@ -131,6 +132,8 @@ flowchart LR
   fields (loading status, in-flight request) are not persisted.
 - Components are presentational and receive data and callbacks through props. The tree is
   shallow, so React Context is not needed.
+- The keypad is data-driven: `keys.ts` lists every key (label, accessible name, style, action)
+  and the keyboard map points at the same key ids, so a click and a key press run the same code.
 
 ### 3.3 Styling
 
@@ -144,10 +147,10 @@ Layout is mobile-first with one breakpoint at 768 px.
 |-------|------|-------|
 | Go core | `testing`, table-driven | Every operation, every edge case and error, rounding |
 | Go api | `net/http/httptest` | Status codes, error codes, JSON shape, middleware |
-| FE reducer and selectors | Vitest | Every transition in functional spec §3 |
+| FE reducer and operation rules | Vitest | Every transition in functional spec §3, driven by key sequences such as `'2+3*4='` |
 | FE hooks | Vitest + Testing Library | Request lifecycle, abort, persistence and hydration |
 | FE components | Vitest + Testing Library + user-event | Rendering, clicks, keyboard, accessibility names |
 | FE API client | Vitest with mocked `fetch` | Success, API error, network error |
 
 Coverage reports: `go test -coverprofile` for the backend, `@vitest/coverage-v8` for the
-frontend. Summary in `docs/coverage.md`.
+frontend. Summary in [docs/coverage.md](../coverage.md).
