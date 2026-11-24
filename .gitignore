@@ -1,0 +1,24 @@
+# Dependencies and builds
+node_modules/
+dist/
+build/
+*.exe
+*.test
+
+# Coverage output
+coverage/
+coverage.out
+coverage.html
+*.coverprofile
+
+# Environment and local settings
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
