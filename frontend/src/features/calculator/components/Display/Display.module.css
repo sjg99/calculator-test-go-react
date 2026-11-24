@@ -1,0 +1,80 @@
+.display {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-1);
+  min-height: 8rem;
+  padding: var(--space-4) var(--space-3) var(--space-3);
+  overflow: hidden;
+  text-align: right;
+  background: var(--color-surface-sunken);
+  border-radius: var(--radius-md);
+}
+
+.expression {
+  min-height: 1.5em;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.value {
+  display: block;
+  font-size: var(--font-size-display);
+  font-weight: 300;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.value[data-size='md'] {
+  font-size: calc(var(--font-size-display) * 0.72);
+}
+
+.value[data-size='sm'] {
+  font-size: calc(var(--font-size-display) * 0.55);
+}
+
+.error {
+  color: var(--color-error);
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+  letter-spacing: normal;
+  line-height: 1.4;
+}
+
+/* A thin bar that only appears if a request takes longer than a moment. */
+.progress {
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+  opacity: 0;
+}
+
+.progressVisible {
+  animation:
+    progress-fade 0ms linear 200ms forwards,
+    progress-slide 900ms ease-in-out infinite;
+}
+
+@keyframes progress-fade {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes progress-slide {
+  from {
+    background-position: -100% 0;
+  }
+
+  to {
+    background-position: 200% 0;
+  }
+}

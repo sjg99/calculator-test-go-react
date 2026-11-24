@@ -1,0 +1,12 @@
+.app {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: var(--space-4);
+}
+
+@media (max-width: 479px) {
+  .app {
+    padding: var(--space-2);
+  }
+}

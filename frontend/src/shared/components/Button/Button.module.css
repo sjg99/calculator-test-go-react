@@ -1,0 +1,82 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: var(--key-min-size);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-key);
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--duration-fast),
+    color var(--duration-fast),
+    transform var(--duration-fast);
+}
+
+.button:active {
+  transform: scale(0.96);
+}
+
+.digit {
+  background: var(--color-key-digit);
+}
+
+.function {
+  background: var(--color-key-function);
+  font-size: var(--font-size-lg);
+}
+
+.operator {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: 1.5rem;
+}
+
+.operator.active {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.equals {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-size: 1.75rem;
+}
+
+.ghost {
+  min-height: auto;
+  padding: var(--space-1) var(--space-2);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-sm);
+}
+
+@media (hover: hover) {
+  .digit:hover {
+    background: var(--color-key-digit-hover);
+  }
+
+  .function:hover {
+    background: var(--color-key-function-hover);
+  }
+
+  .operator:not(.active):hover {
+    background: color-mix(in srgb, var(--color-accent-soft) 80%, var(--color-accent));
+  }
+
+  .equals:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .ghost:hover {
+    color: var(--color-text);
+    background: var(--color-surface-sunken);
+  }
+}

@@ -1,0 +1,20 @@
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: minmax(var(--key-min-size), 1fr);
+  grid-template-areas:
+    'clear     backspace sign    divide'
+    'sqrt      power     percent multiply'
+    'd7        d8        d9      subtract'
+    'd4        d5        d6      add'
+    'd1        d2        d3      equals'
+    'd0        d0        decimal equals';
+  gap: var(--space-2);
+  transition: opacity var(--duration-fast);
+}
+
+/* Dim only if a request takes longer than a moment, so fast answers don't flicker. */
+.keypad[aria-busy='true'] {
+  opacity: 0.6;
+  transition-delay: 200ms;
+}
