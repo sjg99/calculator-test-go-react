@@ -26,8 +26,13 @@
   text-align: center;
 }
 
+/*
+ * Starts at its content height (the panel has no fixed height on mobile) and
+ * shrinks, scrolling, when the panel is capped: max-height on mobile, the
+ * calculator's height on wide screens.
+ */
 .list {
-  flex: 1 1 0;
+  flex: 1 1 auto;
   min-height: 0;
   margin: 0;
   padding: 0;
