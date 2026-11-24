@@ -23,6 +23,14 @@ import (
 const shutdownTimeout = 10 * time.Second
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "healthcheck" {
+		if err := healthcheck(os.Getenv, &http.Client{Timeout: 2 * time.Second}); err != nil {
+			fmt.Fprintln(os.Stderr, "unhealthy:", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
@@ -30,6 +38,25 @@ func main() {
 		fmt.Fprintln(os.Stderr, "error:", err)
 		os.Exit(1)
 	}
+}
+
+// healthcheck asks the server running on this host whether it is healthy.
+// The container image has no shell or curl, so its health check runs
+// "api healthcheck" instead.
+func healthcheck(getenv func(string) string, client *http.Client) error {
+	cfg, err := config.Load(getenv)
+	if err != nil {
+		return err
+	}
+	resp, err := client.Get(fmt.Sprintf("http://127.0.0.1:%d/healthz", cfg.Port))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("health endpoint returned %d", resp.StatusCode)
+	}
+	return nil
 }
 
 // run wires the service together and serves until ctx is cancelled, then

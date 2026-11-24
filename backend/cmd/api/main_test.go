@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
@@ -49,6 +50,55 @@ func TestRun_ServesAndShutsDown(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("server did not shut down")
 	}
+}
+
+func TestHealthcheck(t *testing.T) {
+	portOf := func(srv *httptest.Server) func(string) string {
+		port := strconv.Itoa(srv.Listener.Addr().(*net.TCPAddr).Port)
+		return func(k string) string {
+			if k == "PORT" {
+				return port
+			}
+			return ""
+		}
+	}
+
+	t.Run("healthy", func(t *testing.T) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path != "/healthz" {
+				t.Errorf("path = %s, want /healthz", r.URL.Path)
+			}
+		}))
+		defer srv.Close()
+		if err := healthcheck(portOf(srv), srv.Client()); err != nil {
+			t.Errorf("err = %v, want nil", err)
+		}
+	})
+
+	t.Run("unhealthy status", func(t *testing.T) {
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}))
+		defer srv.Close()
+		if err := healthcheck(portOf(srv), srv.Client()); err == nil || !strings.Contains(err.Error(), "503") {
+			t.Errorf("err = %v, want a 503 error", err)
+		}
+	})
+
+	t.Run("server down", func(t *testing.T) {
+		srv := httptest.NewServer(http.NotFoundHandler())
+		getenv := portOf(srv)
+		srv.Close()
+		if err := healthcheck(getenv, http.DefaultClient); err == nil {
+			t.Error("expected an error")
+		}
+	})
+
+	t.Run("invalid config", func(t *testing.T) {
+		if err := healthcheck(func(string) string { return "x" }, http.DefaultClient); err == nil {
+			t.Error("expected an error")
+		}
+	})
 }
 
 func TestRun_InvalidConfig(t *testing.T) {

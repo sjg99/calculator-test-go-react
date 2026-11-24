@@ -1,0 +1,17 @@
+# Runs the full stack: `docker compose up --build`, then open http://localhost:3000
+services:
+  api:
+    build: ./backend
+    environment:
+      LOG_LEVEL: info
+    # Not published: the browser reaches the API through nginx on the web service.
+    restart: unless-stopped
+
+  web:
+    build: ./frontend
+    ports:
+      - "3000:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped

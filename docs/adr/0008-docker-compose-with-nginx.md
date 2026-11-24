@@ -11,14 +11,16 @@ image (Go serving the embedded React build) or two images orchestrated by Compos
 ## Decision
 
 - `backend/Dockerfile`: multi-stage build, static Go binary on `gcr.io/distroless/static:nonroot`.
-- `frontend/Dockerfile`: multi-stage build, static files on `nginx:alpine`. nginx serves the app
-  with an SPA fallback and proxies `/api/` to the `api` service.
+- `frontend/Dockerfile`: multi-stage build, static files on `nginxinc/nginx-unprivileged`
+  (non-root, port 8080). nginx serves the app with an SPA fallback, long-lived caching for
+  hashed assets, basic security headers, and proxies `/api/` to the `api` service.
 - `docker-compose.yml` at the repository root starts both; the app is on `http://localhost:3000`.
 
 ## Consequences
 
 - Frontend and backend stay independently deployable, as in a microservice setup.
 - The browser sees one origin, so CORS is not needed in this setup.
-- Runtime images are small and run as non-root. The distroless image has no shell, so the
-  image has no built-in health check and Compose only relies on the process staying up.
+- Runtime images are small (about 17 MB for the API) and run as non-root. The distroless
+  image has no shell or curl, so the binary has a `healthcheck` subcommand that calls
+  `/healthz`; Compose starts nginx only once the API reports healthy.
 - Two images to build instead of one, which Compose hides behind a single command.
