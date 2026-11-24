@@ -154,11 +154,15 @@ Message per error code: `division_by_zero` "Can't divide by zero", `negative_squ
 | `n` | ± (negate) |
 
 Keyboard shortcuts are ignored while focus is in a text field and when Ctrl, Meta or Alt is held.
+The matching on-screen key briefly flashes, so keyboard input gets the same feedback as a click.
 
 ### 3.9 Layout
 
 - Usable from 320 px wide. Keys are at least 44 × 44 px touch targets.
-- Narrow screens: the keypad fills the width; history opens as a panel under the keypad.
-- Wide screens (≥ 768 px): history is shown beside the keypad.
+- Narrow screens: the keypad fills the width; a "History (n)" toggle above the display opens the
+  history panel under the keypad.
+- Wide screens (≥ 768 px): history is always shown beside the keypad, at the same height, and
+  scrolls when it is longer.
+- `xʸ` is styled like `√` and `%` (advanced functions) but still highlights while it is pending.
 - Every key has an accessible name (e.g. "divide", "square root"); results are announced
   through an `aria-live` region.

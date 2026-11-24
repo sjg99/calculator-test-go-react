@@ -8,11 +8,13 @@ export interface KeypadProps {
   actions: CalculatorActions
   /** The operator waiting for its right operand, highlighted on the keypad. */
   activeOperator?: BinaryOperation | null
+  /** Id of a key to flash, e.g. because its physical key was just pressed. */
+  flashKey?: string | null
   /** A calculation is in flight; key presses are ignored meanwhile. */
   busy?: boolean
 }
 
-export function Keypad({ actions, activeOperator = null, busy = false }: KeypadProps) {
+export function Keypad({ actions, activeOperator = null, flashKey = null, busy = false }: KeypadProps) {
   return (
     <div className={styles.keypad} role="group" aria-label="Keypad" aria-busy={busy}>
       {KEYS.map((key) => {
@@ -24,6 +26,7 @@ export function Keypad({ actions, activeOperator = null, busy = false }: KeypadP
             active={isOperator && key.operator === activeOperator}
             aria-pressed={isOperator ? key.operator === activeOperator : undefined}
             aria-label={key.name}
+            className={key.id === flashKey ? styles.flash : undefined}
             style={{ gridArea: key.id }}
             onClick={() => key.press(actions)}
           >

@@ -38,7 +38,7 @@
   font-size: 1.5rem;
 }
 
-.operator.active {
+.active {
   background: var(--color-accent);
   color: var(--color-accent-contrast);
 }
@@ -63,7 +63,7 @@
     background: var(--color-key-digit-hover);
   }
 
-  .function:hover {
+  .function:not(.active):hover {
     background: var(--color-key-function-hover);
   }
 

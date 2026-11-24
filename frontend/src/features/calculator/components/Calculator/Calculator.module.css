@@ -1,7 +1,53 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
 .calculator {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   width: min(100%, var(--calculator-width));
   padding: var(--space-4);
+}
+
+/* Narrow screens: a toggle shows the history under the keypad. */
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) 0;
+}
+
+.history {
+  display: none;
+  width: min(100%, var(--calculator-width));
+  max-height: 24rem;
+}
+
+.historyOpen {
+  display: flex;
+}
+
+/* Wide screens: history is always shown beside the keypad, at the same height. */
+@media (min-width: 768px) {
+  .layout {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+  }
+
+  .toolbar {
+    display: none;
+  }
+
+  .history {
+    display: flex;
+    width: var(--history-width);
+    max-height: none;
+    /* Size from the row (the calculator's height), not from the length of the list. */
+    contain: size;
+  }
 }

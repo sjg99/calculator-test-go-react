@@ -13,6 +13,12 @@
   transition: opacity var(--duration-fast);
 }
 
+/* Mirrors a click when the matching physical key is pressed. */
+.flash {
+  transform: scale(0.96);
+  filter: brightness(1.2);
+}
+
 /* Dim only if a request takes longer than a moment, so fast answers don't flicker. */
 .keypad[aria-busy='true'] {
   opacity: 0.6;

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import type { CalculatorApi } from '../../../../api/calculatorApi'
@@ -104,6 +104,68 @@ describe('Calculator', () => {
 
     await waitFor(() => expect(display()).toHaveTextContent('4'))
     expect(screen.getByRole('group', { name: 'Keypad' })).toHaveAttribute('aria-busy', 'false')
+  })
+
+  it('works from the keyboard (spec §3.8)', async () => {
+    render(<Calculator api={fakeApi} />)
+
+    await userEvent.keyboard('12*3{Enter}')
+
+    await waitFor(() => expect(display()).toHaveTextContent('36'))
+    await userEvent.keyboard('{Escape}')
+    expect(display()).toHaveTextContent('0')
+  })
+
+  it('flashes the on-screen key for a physical key press', async () => {
+    render(<Calculator api={fakeApi} />)
+    const seven = screen.getByRole('button', { name: '7' })
+
+    await userEvent.keyboard('7')
+
+    expect(seven.className).toMatch(/flash/)
+    await waitFor(() => expect(seven.className).not.toMatch(/flash/))
+  })
+
+  it('records calculations in history and reuses a result (spec H1, H3)', async () => {
+    render(<Calculator api={fakeApi} />)
+    const history = screen.getByRole('region', { name: 'History' })
+    expect(within(history).getByText('No calculations yet')).toBeInTheDocument()
+
+    await click('1', '2', 'Multiply', '3', 'Equals')
+    const item = await within(history).findByRole('button', { name: '12 × 3 = 36. Use this result' })
+
+    await click('All clear')
+    expect(display()).toHaveTextContent('0')
+
+    await userEvent.click(item)
+    expect(display()).toHaveTextContent('36')
+    expect(screen.getByRole('button', { name: 'History (1)' })).toBeInTheDocument()
+  })
+
+  it('clears history', async () => {
+    render(<Calculator api={fakeApi} />)
+    await click('9', 'Square root')
+    await screen.findByRole('button', { name: '√9 = 3. Use this result' })
+
+    await click('Clear')
+
+    expect(screen.getByText('No calculations yet')).toBeInTheDocument()
+  })
+
+  it('toggles the history panel on narrow screens', async () => {
+    render(<Calculator api={fakeApi} />)
+    const toggle = screen.getByRole('button', { name: 'History (0)' })
+    const panel = screen.getByRole('region', { name: 'History' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(toggle).toHaveAttribute('aria-controls', panel.id)
+
+    await userEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    expect(toggle).toHaveTextContent('Hide history')
+    expect(panel.className).toMatch(/historyOpen/)
+
+    await userEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
   })
 
   it('restores the previous session after a remount', async () => {

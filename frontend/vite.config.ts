@@ -10,6 +10,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    // Test coverage reports are written inside the project; don't reload the page for them.
+    watch: { ignored: ['**/coverage/**'] },
     proxy: {
       '/api': { target: apiTarget, changeOrigin: true },
     },

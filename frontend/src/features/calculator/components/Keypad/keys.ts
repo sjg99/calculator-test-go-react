@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import type { BinaryOperation } from '../../../../api/types'
 import type { ButtonVariant } from '../../../../shared/components/Button/Button'
 import type { CalculatorActions } from '../../hooks/useCalculator'
@@ -8,7 +7,7 @@ import type { Digit } from '../../state/types'
 export interface KeyDefinition {
   /** Unique id; also the CSS grid area the key is placed in. */
   id: string
-  label: ReactNode
+  label: string
   /** Accessible name, read by screen readers. */
   name: string
   variant: ButtonVariant
@@ -25,11 +24,15 @@ const digit = (d: Digit): KeyDefinition => ({
   press: (a) => a.inputDigit(d),
 })
 
-const operator = (op: BinaryOperation, name: string, label: ReactNode = OPERATOR_SYMBOLS[op]): KeyDefinition => ({
+const operator = (
+  op: BinaryOperation,
+  name: string,
+  { label = OPERATOR_SYMBOLS[op], variant = 'operator' }: { label?: string; variant?: ButtonVariant } = {},
+): KeyDefinition => ({
   id: op,
   label,
   name,
-  variant: 'operator',
+  variant,
   operator: op,
   press: (a) => a.chooseOperator(op),
 })
@@ -42,13 +45,8 @@ export const KEYS: KeyDefinition[] = [
   operator('divide', 'Divide'),
 
   { id: 'sqrt', label: '√', name: 'Square root', variant: 'function', press: (a) => a.squareRoot() },
-  operator(
-    'power',
-    'Power',
-    <span>
-      x<sup>y</sup>
-    </span>,
-  ),
+  // Power is a binary operator but sits with the other advanced functions, so it shares their look.
+  operator('power', 'Power', { variant: 'function', label: 'xʸ' }),
   { id: 'percent', label: '%', name: 'Percent', variant: 'function', press: (a) => a.percent() },
   operator('multiply', 'Multiply'),
 
@@ -70,3 +68,27 @@ export const KEYS: KeyDefinition[] = [
   digit('0'),
   { id: 'decimal', label: '.', name: 'Decimal point', variant: 'digit', press: (a) => a.inputDecimal() },
 ]
+
+export const KEYS_BY_ID: ReadonlyMap<string, KeyDefinition> = new Map(KEYS.map((key) => [key.id, key]))
+
+/** Physical keyboard keys (KeyboardEvent.key) mapped to keypad key ids. Functional spec §3.8. */
+export const KEYBOARD_MAP: Readonly<Record<string, string>> = {
+  ...Object.fromEntries('0123456789'.split('').map((d) => [d, `d${d}`])),
+  '.': 'decimal',
+  ',': 'decimal',
+  '+': 'add',
+  '-': 'subtract',
+  '*': 'multiply',
+  '/': 'divide',
+  '^': 'power',
+  Enter: 'equals',
+  '=': 'equals',
+  Backspace: 'backspace',
+  Escape: 'clear',
+  Delete: 'clear',
+  '%': 'percent',
+  r: 'sqrt',
+  R: 'sqrt',
+  n: 'sign',
+  N: 'sign',
+}
