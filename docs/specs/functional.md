@@ -25,7 +25,7 @@ significant digits, and `-0` is returned as `0` (see [ADR 0004](../adr/0004-floa
 | `subtract` | −      | 2 | a − b | `result_overflow` |
 | `multiply` | ×      | 2 | a × b | `result_overflow` |
 | `divide`   | ÷      | 2 | a ÷ b | `division_by_zero` when b = 0; `result_overflow` |
-| `power`    | xʸ     | 2 | aᵇ    | `division_by_zero` when a = 0 and b < 0; `undefined_result` when a < 0 and b is not an integer; `result_overflow` |
+| `power`    | ^      | 2 | aᵇ    | `division_by_zero` when a = 0 and b < 0; `undefined_result` when a < 0 and b is not an integer; `result_overflow` |
 | `sqrt`     | √      | 1 | √a    | `negative_square_root` when a < 0 |
 | `percent`  | %      | 1 or 2 | `[v]` → v ÷ 100; `[v, base]` → base × v ÷ 100 | `result_overflow` |
 

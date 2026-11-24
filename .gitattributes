@@ -1,0 +1,7 @@
+# Normalize line endings so files behave the same on Windows, in Docker and in CI.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff2 binary
